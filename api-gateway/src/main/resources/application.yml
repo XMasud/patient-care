@@ -22,21 +22,44 @@ spring:
             - StripPrefix=1
             - JwtValidation
 
-        - id: api-docs-patient-route
+        - id: api-docs-patients-route
           uri: http://patient-service:4000
           predicates:
             - Path=/api-docs/patients
           filters:
-            - RewritePath=/api-docs/patients,/v3/api-docs
+            - RewritePath=api-docs/patients, /v3/api-docs
 
-        - id: api-docs-wildcard-route
-          uri: http://patient-service:4000
+#        - id: swagger-ui-patients-route
+#          uri: http://patient-service:4000
+#          predicates:
+#            - Path=/patients/swagger-ui/**
+#          filters:
+#            - RewritePath=/patients/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
+
+        - id: api-docs-auth-route
+          uri: http://auth-service:4005
           predicates:
-            - Path=/v3/api-docs/**
+            - Path=/api-docs/auth
           filters:
-            - RewritePath=/v3/api-docs/(?<segment>.*), /v3/api-docs/${segment}
+            - RewritePath=/api-docs/auth,/v3/api-docs
+#
+#        - id: swagger-ui-auth-route
+#          uri: http://auth-service:4005
+#          predicates:
+#            - Path=/auth/swagger-ui/**
+#          filters:
+#            - RewritePath=/auth/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
 
-        - id: swagger-ui-route
+        - id: swagger-ui-route-patients
           uri: http://patient-service:4000
           predicates:
-            - Path=/swagger-ui/**
+            - Path=/patients/swagger-ui/**
+          filters:
+            - RewritePath=/patients/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
+
+        - id: swagger-ui-route-auth
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/auth/swagger-ui/**
+          filters:
+            - RewritePath=/auth/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
