@@ -1,0 +1,65 @@
+server:
+  port: 4004
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        ## http://localhost:4004/auth/login
+        ## API Gateway Convert -> http://auth-service:4005/login
+        - id: auth-service-route
+          uri: http://host.docker.internal:4005
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+
+        - id: patient-service-route
+          uri: http://host.docker.internal:4000
+          predicates:
+            - Path=/api/patients/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        - id: api-docs-patients-route
+          uri: http://host.docker.internal:4000
+          predicates:
+            - Path=/api-docs/patients
+          filters:
+            - RewritePath=api-docs/patients, /v3/api-docs
+
+        #        - id: swagger-ui-patients-route
+        #          uri: http://patient-service:4000
+        #          predicates:
+        #            - Path=/patients/swagger-ui/**
+        #          filters:
+        #            - RewritePath=/patients/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
+
+        - id: api-docs-auth-route
+          uri: http://host.docker.internal:4005
+          predicates:
+            - Path=/api-docs/auth
+          filters:
+            - RewritePath=/api-docs/auth,/v3/api-docs
+        #
+        #        - id: swagger-ui-auth-route
+        #          uri: http://auth-service:4005
+        #          predicates:
+        #            - Path=/auth/swagger-ui/**
+        #          filters:
+        #            - RewritePath=/auth/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
+
+        - id: swagger-ui-route-patients
+          uri: http://host.docker.internal:4000
+          predicates:
+            - Path=/patients/swagger-ui/**
+          filters:
+            - RewritePath=/patients/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
+
+        - id: swagger-ui-route-auth
+          uri: http://host.docker.internal:4005
+          predicates:
+            - Path=/auth/swagger-ui/**
+          filters:
+            - RewritePath=/auth/swagger-ui/(?<segment>.*), /swagger-ui/${segment}
